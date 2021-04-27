@@ -1,0 +1,27 @@
+version: "3.7"
+
+networks:
+  ssl_test:
+    external: false
+services:
+  caddy:
+    image: caddy:alpine
+    container_name: ssl_test_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/certs:/root/certs
+      - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - ssl_test
+    depends_on:
+      - server
+  server:
+    build:
+      context: ./server
+      dockerfile: ./app.Dockerfile
+    container_name: ssl_test_server
+    restart: always
+    networks:
+      - ssl_test
